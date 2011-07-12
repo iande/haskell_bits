@@ -55,28 +55,25 @@ butterflyList [1 :+ 0, 2 :+ 0, 3 :+ 0, 4 :+ 0, 5 :+ 0, 6 :+ 0, 7 :+ 0, 8 :+ 0,
               [2 :+ 0, 4 :+ 0, 6 :+ 0, 8 :+ 0, 0 :+ 2, 0 :+ 4, 0 :+ 6, 0 :+ 8])
 --}
 
-calcResults :: (RealFloat a) => (([Complex a], [[Complex a]]), ([Complex a], [Complex a])) -> (([Complex a], [[Complex a]]), ([Complex a], [Complex a]))
-calcResults (([w, wn], [ya, yb]), ([], [])) = (([w, wn], [reverse ya, reverse yb]), ([], []))
-calcResults (([w, wn], [ya, yb]), (y1:y1s, y2:y2s)) = 
-  calcResults (([ w*wn, wn], [(y1 + w*y2) : ya, (y1 - w*y2) : yb]), (y1s, y2s))
-
-
-fft :: (RealFloat a) => Integer -> Complex a -> [Complex a] -> [Complex a] -> [Complex a]
-fft 1 wn (x:xs) _ = [x]
-fft 2 wn (x1:x2:xs) _ = [ (x1 + x2), (x1 - x2)]
-fft n wn xs ys = let m       = round (fromIntegral(n) / 2)
-                     (x1,x2) = butterflyList xs
-                     wn'     = wn * wn
-                     y1      = fft m wn' x1 []
-                     y2      = fft m wn' x2 []
-                     w       = 1 :+ 0
-                     res     = calcResults (([w,wn], [[], []]), (y1, y2))
-                     in (head (snd (fst res))) ++ (head (tail (snd (fst res))))
-                     
+fft :: (RealFloat a) => Integer -> Complex a -> [Complex a] -> [Complex a]
+fft 1 wn (x:xs)     = [x]
+fft 2 wn (x1:x2:xs) = [ (x1 + x2), (x1 - x2)]
+fft n wn xs         = let m       = round (fromIntegral(n) / 2)
+                          (x1,x2) = butterflyList xs
+                          wn'     = wn * wn
+                          y1      = fft m wn' x1
+                          y2      = fft m wn' x2
+                          w       = 1 :+ 0
+                          cRes (k, (ps,ms)) (v1,v2) = let kv2 = k*v2
+                                                          vP  = v1 + kv2
+                                                          vM  = v1 - kv2
+                                                          in (k*wn, (vP:ps, vM:ms))
+                          (_,(c1s,c2s)) = foldl cRes (w, ([],[])) (zip y1 y2)
+                          in (reverse c1s ++ reverse c2s)
 {--
 fft 16 (0.923880 :+ (-0.382683))
     [0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0,
-     0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0] []
+     0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0]
 
 =>  [8 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0,
     -8 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0]

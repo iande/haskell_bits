@@ -5,10 +5,10 @@ import Criterion.Config
 import Criterion.Main
 import Data.Complex
 
-runFFT :: Integer -> [Complex Double] -> [Complex Double]
-runFFT sz inps = let theta = (2.0 * pi / fromIntegral(sz))
-                     w     = conjugate $ cis theta
-                     in fft sz w inps []
+--runFFT :: (Integer -> [Complex Double] -> [Complex Double]) -> Integer -> [Complex Double] -> [Complex Double]
+runFFT f sz inps = let theta = (2.0 * pi / fromIntegral(sz))
+                       w     = conjugate $ cis theta
+                       in f sz w inps
 
 squareWave :: [Complex Double]
 squareWave = [0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0,
@@ -24,12 +24,12 @@ benchConfig = defaultConfig {
 
 main = do
   putStr "Square Wave Result:\n\t"
-  putStrLn . show $ runFFT 16 squareWave
+  putStrLn . show $ runFFT fft 16 squareWave
   putStr "Saw-Tooth Wave Result:\n\t"
-  putStrLn . show $ runFFT 16 sawToothWave
+  putStrLn . show $ runFFT fft 16 sawToothWave
   defaultMainWith benchConfig (return ()) [
-        bgroup "fft" [ bench "square wave" $ nf (runFFT 16) squareWave,
-                       bench "saw-tooth wave" $ nf (runFFT 16) sawToothWave
+        bgroup "fft" [ bench "square wave" $ nf (runFFT fft 16) squareWave,
+                       bench "saw-tooth wave" $ nf (runFFT fft 16) sawToothWave
                      ]
        ]
 
@@ -44,32 +44,32 @@ I have also formatted the resulting lists to make them a little prettier
 
 {--
 Square Wave Result:
-	[  8.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
-	   0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
+	[8.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
+	 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
 	 (-8.0) :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
-	   0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0]
+	 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0]
 Saw-Tooth Wave Result:
-	[ 24.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
-	 (-8.0) :+ (-8.0), 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
-	   8.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
+	[24.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
+	(-8.0) :+ (-8.0), 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
+	8.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0,
 	(-7.999999999999999) :+ 8.0, 0.0 :+ 0.0, 0.0 :+ 0.0, 0.0 :+ 0.0]
 warming up
 estimating clock resolution...
-mean is 7.033964 us (80001 iterations)
-found 3086 outliers among 79999 samples (3.9%)
-  2291 (2.9%) high severe
+mean is 6.990687 us (80001 iterations)
+found 2346 outliers among 79999 samples (2.9%)
+  1755 (2.2%) high severe
 estimating cost of a clock call...
-mean is 60.41778 ns (35 iterations)
-found 1 outliers among 35 samples (2.9%)
-  1 (2.9%) high mild
+mean is 59.62360 ns (36 iterations)
+found 1 outliers among 36 samples (2.8%)
+  1 (2.8%) high mild
 
 benchmarking fft/square wave
-collecting 1000 samples, 204 iterations each, in estimated 7.065151 s
-mean: 34.04159 us, lb 33.99916 us, ub 34.09050 us, ci 0.950
-std dev: 732.3244 ns, lb 648.2252 ns, ub 986.0652 ns, ci 0.950
+collecting 1000 samples, 232 iterations each, in estimated 7.019795 s
+mean: 30.44903 us, lb 30.42474 us, ub 30.47662 us, ci 0.950
+std dev: 415.8990 ns, lb 372.7239 ns, ub 479.0942 ns, ci 0.950
 
 benchmarking fft/saw-tooth wave
-collecting 1000 samples, 210 iterations each, in estimated 7.060356 s
-mean: 34.17536 us, lb 34.12706 us, ub 34.23696 us, ci 0.950
-std dev: 875.0766 ns, lb 731.1756 ns, ub 1.180891 us, ci 0.950
+collecting 1000 samples, 231 iterations each, in estimated 6.998573 s
+mean: 30.50131 us, lb 30.46343 us, ub 30.56316 us, ci 0.950
+std dev: 763.3206 ns, lb 552.3002 ns, ub 1.337548 us, ci 0.950
 --}
