@@ -8,7 +8,7 @@ An implementation of the
 derived from Justin Grant's
 [Qi implementation](http://code.google.com/p/jngmisc/source/browse/qi/fft.qi).
 
-Benchmarks for this implementation can be found in [FFTBench.hs](FFTBench.hs)
+Benchmarks for this implementation can be found in [FFTBench.hs](https://github.com/iande/haskell_bits/blob/master/FFTBench.hs)
 demonstrating its performance against Matt Morrow's
 [pure-fft](http://hackage.haskell.org/package/pure-fft) package for various
 inputs.  It's important to note that I doubt there is any significance to the
