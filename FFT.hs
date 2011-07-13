@@ -55,24 +55,24 @@ butterflyList [1 :+ 0, 2 :+ 0, 3 :+ 0, 4 :+ 0, 5 :+ 0, 6 :+ 0, 7 :+ 0, 8 :+ 0,
               [2 :+ 0, 4 :+ 0, 6 :+ 0, 8 :+ 0, 0 :+ 2, 0 :+ 4, 0 :+ 6, 0 :+ 8])
 --}
 
-fft :: (RealFloat a) => Integer -> Complex a -> [Complex a] -> [Complex a]
-fft 1 wn (x:xs)     = [x]
-fft 2 wn (x1:x2:xs) = [ (x1 + x2), (x1 - x2)]
-fft n wn xs         = let m       = round (fromIntegral(n) / 2)
-                          (x1,x2) = butterflyList xs
-                          wn'     = wn * wn
-                          y1      = fft m wn' x1
-                          y2      = fft m wn' x2
-                          w       = 1 :+ 0
-                          cRes (k, (ps,ms)) (v1,v2) = let kv2 = k*v2
-                                                          vP  = v1 + kv2
-                                                          vM  = v1 - kv2
-                                                          in (k*wn, (vP:ps, vM:ms))
-                          (_,(c1s,c2s)) = foldl cRes (w, ([],[])) (zip y1 y2)
-                          in (reverse c1s ++ reverse c2s)
+fft :: [Complex Double] -> [Complex Double]
+fft []      = []
+fft [x1,x2] = [ (x1 + x2), (x1 - x2) ]
+fft xs      = let n       = length xs
+                  wn      = conjugate $ cis (2.0 * pi / fromIntegral(n))
+                  m       = round (fromIntegral(n) / 2)
+                  (x1,x2) = butterflyList xs
+                  y1      = fft x1
+                  y2      = fft x2
+                  w       = 1 :+ 0
+                  (_,(c1s,c2s)) = foldl cRes (w, ([],[])) (zip y1 y2)
+                  cRes (k, (ps,ms)) (v1,v2) = let kv2 = k*v2
+                                                  vP  = v1 + kv2
+                                                  vM  = v1 - kv2
+                                                  in (k*wn, (vP:ps, vM:ms))
+                  in (reverse c1s ++ reverse c2s)
 {--
-fft 16 (0.923880 :+ (-0.382683))
-    [0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0,
+fft [0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0,
      0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0]
 
 =>  [8 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0, 0 :+ 0,

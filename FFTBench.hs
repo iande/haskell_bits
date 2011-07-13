@@ -5,11 +5,6 @@ import Criterion.Config
 import Criterion.Main
 import Data.Complex
 
---runFFT :: (Integer -> [Complex Double] -> [Complex Double]) -> Integer -> [Complex Double] -> [Complex Double]
-runFFT f sz inps = let theta = (2.0 * pi / fromIntegral(sz))
-                       w     = conjugate $ cis theta
-                       in f sz w inps
-
 squareWave :: [Complex Double]
 squareWave = [0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0,
               0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0, 0 :+ 0, 1 :+ 0]
@@ -45,18 +40,18 @@ benchConfig = defaultConfig {
 
 main = do
   putStr "Square Wave Result:\n\t"
-  putStrLn . show $ runFFT fft 16 squareWave
+  putStrLn . show $ fft squareWave
   putStr "Saw-Tooth Wave Result:\n\t"
-  putStrLn . show $ runFFT fft 16 sawToothWave
+  putStrLn . show $ fft sawToothWave
   putStr "Test1 Wave Result:\n\t"
-  putStrLn . show $ runFFT fft 8 test1Wave
+  putStrLn . show $ fft test1Wave
   putStr "Test2 Wave Result:\n\t"
-  putStrLn . show $ runFFT fft 8 test2Wave
+  putStrLn . show $ fft test2Wave
   defaultMainWith benchConfig (return ()) [
-        bgroup "fft" [ bench "square wave" $ nf (runFFT fft 16) squareWave,
-                       bench "saw-tooth wave" $ nf (runFFT fft 16) sawToothWave,
-                       bench "test1 wave" $ nf (runFFT fft 8) test1Wave,
-                       bench "test2 wave" $ nf (runFFT fft 8) test2Wave
+        bgroup "fft" [ bench "square wave" $ nf fft squareWave,
+                       bench "saw-tooth wave" $ nf fft sawToothWave,
+                       bench "test1 wave" $ nf fft test1Wave,
+                       bench "test2 wave" $ nf fft test2Wave
                      ]
        ]
 
@@ -94,32 +89,32 @@ Test2 Wave Result:
 	 0.7071067811865474 :+ 0.7071067811865477]
 warming up
 estimating clock resolution...
-mean is 8.010687 us (80001 iterations)
-found 11361 outliers among 79999 samples (14.2%)
-  5537 (6.9%) high mild
-  5824 (7.3%) high severe
+mean is 7.065876 us (80001 iterations)
+found 3543 outliers among 79999 samples (4.4%)
+ 3002 (3.8%) high severe
 estimating cost of a clock call...
-mean is 63.72107 ns (41 iterations)
-found 1 outliers among 41 samples (2.4%)
-  1 (2.4%) high mild
+mean is 60.72323 ns (70 iterations)
+found 4 outliers among 70 samples (5.7%)
+ 2 (2.9%) high mild
+ 2 (2.9%) high severe
 
 benchmarking fft/square wave
-collecting 1000 samples, 252 iterations each, in estimated 8.032378 s
-mean: 35.16367 us, lb 34.98511 us, ub 35.35924 us, ci 0.950
-std dev: 3.011818 us, lb 2.788621 us, ub 3.320808 us, ci 0.950
+collecting 1000 samples, 322 iterations each, in estimated 7.079556 s
+mean: 21.91537 us, lb 21.84829 us, ub 22.00604 us, ci 0.950
+std dev: 1.248337 us, lb 1.011847 us, ub 1.578042 us, ci 0.950
 
 benchmarking fft/saw-tooth wave
-collecting 1000 samples, 215 iterations each, in estimated 8.027195 s
-mean: 34.14124 us, lb 33.85232 us, ub 34.53818 us, ci 0.950
-std dev: 5.412538 us, lb 4.306758 us, ub 7.160480 us, ci 0.950
+collecting 1000 samples, 315 iterations each, in estimated 7.087444 s
+mean: 21.98863 us, lb 21.93955 us, ub 22.05070 us, ci 0.950
+std dev: 888.0943 ns, lb 754.7825 ns, ub 1.121602 us, ci 0.950
 
 benchmarking fft/test1 wave
-collecting 1000 samples, 471 iterations each, in estimated 8.026252 s
-mean: 15.32201 us, lb 15.25763 us, ub 15.42407 us, ci 0.950
-std dev: 1.279731 us, lb 933.2923 ns, ub 2.250423 us, ci 0.950
+collecting 1000 samples, 811 iterations each, in estimated 7.068688 s
+mean: 8.627667 us, lb 8.609107 us, ub 8.651401 us, ci 0.950
+std dev: 337.2305 ns, lb 278.9374 ns, ub 431.2060 ns, ci 0.950
 
 benchmarking fft/test2 wave
-collecting 1000 samples, 540 iterations each, in estimated 8.021356 s
-mean: 15.95777 us, lb 15.88195 us, ub 16.04082 us, ci 0.950
-std dev: 1.280561 us, lb 1.194957 us, ub 1.390523 us, ci 0.950
+collecting 1000 samples, 821 iterations each, in estimated 7.068300 s
+mean: 8.712524 us, lb 8.685743 us, ub 8.743774 us, ci 0.950
+std dev: 466.3676 ns, lb 414.3701 ns, ub 542.8018 ns, ci 0.950
 --}
