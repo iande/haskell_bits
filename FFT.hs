@@ -58,9 +58,9 @@ butterflyList [1 :+ 0, 2 :+ 0, 3 :+ 0, 4 :+ 0, 5 :+ 0, 6 :+ 0, 7 :+ 0, 8 :+ 0,
 fft :: [Complex Double] -> [Complex Double]
 fft []      = []
 fft [x1,x2] = [ (x1 + x2), (x1 - x2) ]
-fft xs      = let n       = length xs
-                  wn      = conjugate $ cis (2.0 * pi / fromIntegral(n))
-                  m       = round (fromIntegral(n) / 2)
+fft xs      = let n       = fromIntegral (length xs)
+                  wn      = conjugate $ cis (2.0 * pi / n)
+                  m       = round (n / 2)
                   (x1,x2) = butterflyList xs
                   y1      = fft x1
                   y2      = fft x2
